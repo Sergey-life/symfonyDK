@@ -1,4 +1,5 @@
 .DS_Store
+.gitignore
 .idea/.gitignore
 .idea/dictionaries
 .idea/misc.xml
@@ -7,4 +8,5 @@
 .idea/php.xml
 .idea/symfony2.xml
 .idea/symfonyDK.iml
-.gitignore
+.idea/vcs.xml
+.idea
