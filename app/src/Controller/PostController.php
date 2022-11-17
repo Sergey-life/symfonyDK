@@ -7,9 +7,11 @@ use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
+use App\Service\FileUploader;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,29 +44,18 @@ class PostController extends AbstractController
     }
 
     #[Route('/new', name: 'new_post')]
-    public function new(Request $request, PostRepository $postRepository, CategoryRepository $categoryRepository,SluggerInterface $slugger): Response
+    public function new(Request $request, PostRepository $postRepository, CategoryRepository $categoryRepository, FileUploader $fileUploader): Response
     {
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            /**@var UploadedFile $postImage*/
             $postImage = $form->get('image')->getData();
             if ($postImage) {
-                $originalFilename = pathinfo($postImage->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeImageName = $slugger->slug($originalFilename);
-                $newFileName = $safeImageName.'-'.uniqid().'.'.$postImage->guessExtension();
-                try {
-                    $postImage->move(
-                        $this->getParameter('images_directory'),
-                        $newFileName
-                    );
-                } catch (FileException $e) {
-                    throw $this->createNotFoundException(
-                        'При завантаженні зображення сталася помилка!'.$e
-                    );
-                }
-                $post->setImage($newFileName);
-                $category = $categoryRepository->find($form->get('category_id')->getData());
+                $postImageName = $fileUploader->upload($postImage);
+                $post->setImage($postImageName);
+                $category = $categoryRepository->find($form->get('categories')->getData());
                 $post->setCategory($category);
             }
             $postRepository->save($post, true);
