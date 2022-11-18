@@ -11,6 +11,7 @@ use App\Service\FileUploader;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,21 +24,6 @@ class PostController extends AbstractController
     #[Route('/', name: 'all_post')]
     public function index(PostRepository $postRepository): Response
     {
-//        $entityManager = $doctrine->getManager();
-//
-//        $post = new Post();
-//        $post->setTitle('Топ 10 красивих акордів на гітарі');
-//        $post->setBody('Am7, Em7, G, H7, ,Dm7 Fsus, F#m, G#7, C, Fmaj');
-//        $post->setImage('test.img');
-//        $post->setSlug('top-10-beautiful-guitar-chords');
-//        $post->setTopicId(1);
-//
-//        $entityManager->persist($post);
-//        $entityManager->flush();
-//
-//        return new Response('Пост з id: '.$post->getId().' успішно збережений!');
-
-
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
         ]);
@@ -64,27 +50,12 @@ class PostController extends AbstractController
         }
 
         return $this->renderForm('post/new.html.twig', [
-            'form' => $form
+            'form' => $form,
+            'post' => $post
         ]);
     }
 
     #[Route('post/{id}', name: 'post_show')]
-    // 1-й варіант отримати об'єкт по id
-//    public function show(ManagerRegistry $doctrine, int $id)
-//    {
-//        $post = $doctrine->getRepository(Post::class)->find($id);
-//        if (!$post) {
-//            throw $this->createNotFoundException(
-//                'Продукта з id '.$id.' не знайдено!'
-//            );
-//        }
-//
-//        return $this->render('post/show.html.twig', [
-//            'post' => $post
-//        ]);
-//    }
-
-    // 2-й варіант отримати об'єкт по id
     public function show(int $id, PostRepository $postRepository): Response
     {
         $post = $postRepository->find($id);
@@ -95,22 +66,22 @@ class PostController extends AbstractController
     }
 
     #[Route('/post/edit/{id}', name: 'post_edit')]
-    public function update(ManagerRegistry $doctrine, int $id): Response
+    public function edit(Request $request, PostRepository $postRepository, Post $post): Response
     {
-        $entityManager = $doctrine->getManager();
-        $post = $entityManager->getRepository(Post::class)->find($id);
+        $post->setImage(
+            new File($this->getParameter('images_directory').'/'.$post->getImage())
+        );
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $postRepository->save($post, true);
 
-        if (!$post) {
-            throw $this->createNotFoundException(
-                'Продукта з id '.$id.' не знайдено!'
-            );
+            return $this->redirectToRoute('all_post', [], Response::HTTP_SEE_OTHER);
         }
 
-        $post->setTitle('Топ 10 красивих акордів на фортепіано');
-        $entityManager->flush();
-
-        return $this->redirectToRoute('post_show', [
-            'id' => $post->getId(),
+        return $this->renderForm('post/edit.html.twig', [
+            'form' => $form,
+            'post' => $post
         ]);
     }
 }

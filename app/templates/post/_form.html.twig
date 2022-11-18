@@ -1,0 +1,8 @@
+{#{{ form(form) }}#}
+
+{{ form_start(form) }}
+    {% if form.image.vars.data %}
+        <img src="{{ asset(image_dir ~ form.image.vars.data) }}"/>
+{#        <img src="{{ asset(image_dir ~ post.image) }}"/>#}
+    {% endif %}
+{{ form_end(form) }}

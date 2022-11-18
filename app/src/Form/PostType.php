@@ -27,7 +27,6 @@ class PostType extends AbstractType
                 'mapped' => false,
                 'choice_label' => 'name',
                 'label' => "Прив'язати до категорії",
-
             ])
             ->add('image', FileType::class, ['label' => 'Додати зображення'])
             ->add('save', SubmitType::class, ['label' => 'Зберегти'])

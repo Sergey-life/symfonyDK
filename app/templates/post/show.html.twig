@@ -1,8 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-  <div>
-    Подивіться на цей чудовий пост:
-    <h2>{{ post.title }}</h2>
-  </div>
+  <!-- Begin page content -->
+  <main class="flex-shrink-0">
+    <div class="container">
+      <h2 class="mt-5">{{ post.title }}</h2>
+      <img src="{{ asset(image_dir ~ post.image) }}" alt="">
+      <p class="lead">{{ post.body }}</p>
+      
+      <p>Повернутись на <a href="{{ path('all_post') }}">головну сторінку</a></p>
+    </div>
+  </main>
 {% endblock %}

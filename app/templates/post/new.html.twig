@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% form_theme form 'bootstrap_5_horizontal_layout.html.twig' %}
+{#{% form_theme form 'bootstrap_5_horizontal_layout.html.twig' %}#}
 
 {% block body %}
     <style>
@@ -11,7 +11,7 @@
     <div class="example-wrapper">
         <div class="container">
             <h3>Додати новий пост</h3>
-            {{ form(form) }}
+            {% include 'post/_form.html.twig' %}
         </div>
     </div>
 {% endblock %}
