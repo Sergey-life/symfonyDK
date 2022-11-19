@@ -9,9 +9,11 @@
         <div class="container">
             <h3>Редагувати пост</h3>
             {{ form_start(form) }}
-            {% if form.image.vars.data %}
-                <img src="{{ asset('/uploads/images/posts/' ~ form.image.vars.data) }}"/>
-            {% endif %}
+{#            {% if form.image.vars.data %}#}
+{#                <img src="{{ asset('/uploads/images/posts/' ~ form.image.vars.data) }}"/>#}
+{#                {{ form_widget(post.image) }}#}
+{#            {% endif %}#}
+            {{ form_widget(form) }}
             {{ form_end(form) }}
 {#            {% include 'post/_form.html.twig' with {'button_label': 'Обновити пост', 'button_color': 'btn-outline-success'} %}#}
         </div>

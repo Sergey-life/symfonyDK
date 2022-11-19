@@ -13,6 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Doctrine\ORM\EntityRepository;
+
 
 class PostType extends AbstractType
 {
@@ -22,13 +25,25 @@ class PostType extends AbstractType
             ->add('title', TextType::class, ['label' => 'Заголовок'])
             ->add('body', TextareaType::class, ['label' => 'Текст поста'])
             ->add('slug', TextType::class, ['label' => 'Посилання на пост'])
-            ->add('categories', EntityType::class, [
+            ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'mapped' => false,
                 'choice_label' => 'name',
                 'label' => "Прив'язати до категорії",
             ])
-            ->add('image', FileType::class, ['label' => 'Додати зображення'])
+            ->add('image', FileType::class, [
+                'label' => 'Додати зображення',
+                'required' => false,
+                "mapped" => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/*',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image',
+                    ])
+                ],
+            ])
             ->add('save', SubmitType::class, ['label' => 'Зберегти'])
         ;
     }

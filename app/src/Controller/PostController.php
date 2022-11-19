@@ -41,7 +41,7 @@ class PostController extends AbstractController
             if ($postImage) {
                 $postImageName = $fileUploader->upload($postImage);
                 $post->setImage($postImageName);
-                $category = $categoryRepository->find($form->get('categories')->getData());
+                $category = $categoryRepository->find($form->get('category')->getData());
                 $post->setCategory($category);
             }
             $postRepository->save($post, true);
@@ -66,14 +66,22 @@ class PostController extends AbstractController
     }
 
     #[Route('/post/edit/{id}', name: 'post_edit')]
-    public function edit(Request $request, PostRepository $postRepository, Post $post): Response
+    public function edit(Request $request, PostRepository $postRepository, Post $post,FileUploader $fileUploader, CategoryRepository $categoryRepository): Response
     {
-        $post->setImage(
-            new File($this->getParameter('images_directory').'/'.$post->getImage())
-        );
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            /**@var UploadedFile $postImage*/
+            $postImage = $form->get('image')->getData();
+            if ($postImage) {
+                $postImageName = $fileUploader->upload($postImage);
+                $post->setImage($postImageName);
+            } else {
+                $category = $categoryRepository->find($form->get('category')->getData());
+                $post->setCategory($category);
+                $postImageOld = $post->getImage();
+                $post->setImage($postImageOld);
+            }
             $postRepository->save($post, true);
 
             return $this->redirectToRoute('all_post', [], Response::HTTP_SEE_OTHER);
