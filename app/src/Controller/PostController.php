@@ -2,22 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
 use App\Service\FileUploader;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
 class PostController extends AbstractController
 {
@@ -66,14 +62,19 @@ class PostController extends AbstractController
     }
 
     #[Route('/post/edit/{id}', name: 'post_edit')]
-    public function edit(Request $request, PostRepository $postRepository, Post $post,FileUploader $fileUploader, CategoryRepository $categoryRepository): Response
+    public function edit(Request $request, PostRepository $postRepository, Post $post, FileUploader $fileUploader, CategoryRepository $categoryRepository): Response
     {
+        $filesystem = new Filesystem();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /**@var UploadedFile $postImage*/
             $postImage = $form->get('image')->getData();
             if ($postImage) {
+                $file = $this->getParameter('images_directory').'/'.$post->getImage();
+                if (file_exists($file)) {
+                    $filesystem->remove($file);
+                }
                 $postImageName = $fileUploader->upload($postImage);
                 $post->setImage($postImageName);
             } else {
