@@ -39,6 +39,7 @@ class PostController extends AbstractController
                 $post->setImage($postImageName);
                 $category = $categoryRepository->find($form->get('category')->getData());
                 $post->setCategory($category);
+                $post->setCreatedAt(new \DateTime());
             }
             $postRepository->save($post, true);
 
@@ -82,6 +83,7 @@ class PostController extends AbstractController
                 $post->setCategory($category);
                 $postImageOld = $post->getImage();
                 $post->setImage($postImageOld);
+                $post->setUpdatedAt(new \DateTime());
             }
             $postRepository->save($post, true);
 
@@ -92,5 +94,20 @@ class PostController extends AbstractController
             'form' => $form,
             'post' => $post
         ]);
+    }
+
+    #[Route('/{id}', name: 'post_delete', methods: ['POST'])]
+    public function delete(Request $request, Post $post, PostRepository $postRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('delete'))) {
+            $file = $this->getParameter('images_directory').'/'.$post->getImage();
+            if (file_exists($file)) {
+                $filesystem = new Filesystem();
+                $filesystem->remove($file);
+            }
+            $postRepository->remove($post, true);
+        }
+
+        return $this->redirectToRoute('all_post', [], Response::HTTP_SEE_OTHER);
     }
 }

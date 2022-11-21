@@ -7,16 +7,16 @@
     </style>
     <div class="example-wrapper">
         <div class="container">
+            <p>Повернутись на <a href="{{ path('all_post') }}">головну сторінку</a></p>
             <h3>Редагувати пост</h3>
-{#            {{ form_start(form) }}#}
-            {{ form(form) }}
-{#            {{ form_end(form) }}#}
+            <form action="{{ path('post_delete', {'id': post.id}) }}" method="post" onsubmit="return confirm('Ви впевненні що хочете видалити цей пост?');">
+                <input type="hidden" name="delete" value="{{ csrf_token('delete' ~ post.id) }}">
+                <button class="btn btn-outline-danger">Видалити</button>
+            </form>
+            {% include 'post/_form.html.twig' with {'button_label': 'Обновити пост', 'button_color': 'btn-outline-success'} %}
             {% if post.image %}
                 <img src="{{ asset(image_dir ~ post.image) }}"/>
-{#                {{ form_widget(post.image) }}#}
             {% endif %}
-{#            {{ dump(form.image.vars) }}#}
-{#            {% include 'post/_form.html.twig' with {'button_label': 'Обновити пост', 'button_color': 'btn-outline-success'} %}#}
         </div>
     </div>
 {% endblock %}
