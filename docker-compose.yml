@@ -27,7 +27,7 @@ services:
     ports:
       - "4306:3306"
     volumes:
-      - ./volumes/db/mariadb:/var/lib/mariadb
+      - ./volumes/db/mariadb:/var/lib/mysql
     environment:
       MYSQL_DATABASE: SymfonyDK
       MYSQL_USER: admin
