@@ -7,7 +7,6 @@ use App\Form\PostType;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
 use App\Service\FileUploader;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -33,12 +32,9 @@ class PostController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /**@var UploadedFile $postImage*/
-            $postImage = $form->get('image')->getData();
-            if ($postImage) {
-                $postImageName = $fileUploader->upload($postImage);
-                $post->setImage($postImageName);
-                $category = $categoryRepository->find($form->get('category')->getData());
-                $post->setCategory($category);
+            if ($postImage = $form->get('image')->getData()) {
+                $post->setImage($fileUploader->upload($postImage));
+                $post->setCategory($categoryRepository->find($form->get('category')->getData()));
                 $post->setCreatedAt(new \DateTime());
             }
             $postRepository->save($post, true);
@@ -52,7 +48,7 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('post/{id}', name: 'post_show')]
+    #[Route('post/{id}', name: 'post_show', methods: ['GET'])]
     public function show(int $id, PostRepository $postRepository): Response
     {
         $post = $postRepository->find($id);
@@ -70,21 +66,15 @@ class PostController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /**@var UploadedFile $postImage*/
-            $postImage = $form->get('image')->getData();
-            if ($postImage) {
+            if ($postImage = $form->get('image')->getData()) {
                 $file = $this->getParameter('images_directory').'/'.$post->getImage();
                 if (file_exists($file)) {
                     $filesystem->remove($file);
                 }
-                $postImageName = $fileUploader->upload($postImage);
-                $post->setImage($postImageName);
-            } else {
-                $category = $categoryRepository->find($form->get('category')->getData());
-                $post->setCategory($category);
-                $postImageOld = $post->getImage();
-                $post->setImage($postImageOld);
-                $post->setUpdatedAt(new \DateTime());
+                $post->setImage($fileUploader->upload($postImage));
             }
+            $post->setCategory($categoryRepository->find($form->get('category')->getData()));
+            $post->setUpdatedAt(new \DateTime());
             $postRepository->save($post, true);
 
             return $this->redirectToRoute('all_post', [], Response::HTTP_SEE_OTHER);
@@ -96,7 +86,7 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'post_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'post_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, Post $post, PostRepository $postRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('delete'))) {

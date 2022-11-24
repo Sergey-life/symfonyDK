@@ -9,7 +9,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class FileUploader
 {
     private $imageDirectory;
-//    private $slugger;
 
     public function __construct($imageDirectory, SluggerInterface $slugger)
     {
@@ -19,8 +18,6 @@ class FileUploader
 
     public function upload(UploadedFile $file)
     {
-//        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-//        $safeImageName = $this->slugger->slug($originalFilename);
         $fileName = md5(uniqid()).'.'.$file->guessExtension();
         try {
             $file->move(
