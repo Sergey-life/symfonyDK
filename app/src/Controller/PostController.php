@@ -7,8 +7,10 @@ use App\Form\PostType;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
 use App\Service\FileUploader;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,8 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class PostController extends AbstractController
 {
     #[Route('/', name: 'all_post')]
-    public function index(PostRepository $postRepository): Response
+    public function index(PostRepository $postRepository, LoggerInterface $logger): Response
     {
+        $logger->info('test controller');
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
         ]);

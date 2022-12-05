@@ -118,7 +118,7 @@
                   <a href="{{ path('post_show', {'id': post.id}) }}"><button type="button" class="btn btn-sm btn-outline-secondary">Дивитись</button></a>
                   <a href="{{ path('post_edit', {'id': post.id}) }}"><button type="button" class="btn btn-sm btn-outline-secondary">Редагувати</button></a>
                 </div>
-                <small class="text-muted">9 mins</small>
+                <small class="text-muted">{{ post.createdAt|ago }}</small>
               </div>
             </div>
           </div>
