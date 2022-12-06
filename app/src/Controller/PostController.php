@@ -7,6 +7,7 @@ use App\Form\PostType;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
 use App\Service\FileUploader;
+use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -15,15 +16,21 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class PostController extends AbstractController
 {
     #[Route('/', name: 'all_post')]
-    public function index(PostRepository $postRepository, LoggerInterface $logger): Response
+    public function index(CacheInterface $cache, PostRepository $postRepository, LoggerInterface $logger): Response
     {
-        $logger->info('test controller');
+        $posts = $cache->get('posts_data', function (CacheItemInterface $cacheItem) use ($postRepository) {
+            $cacheItem->expiresAfter(300);
+            //Вирішуємо проблему N+1 findAll2
+            return $postRepository->findAll2();
+        });
+
         return $this->render('post/index.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'posts' => $posts,
         ]);
     }
 

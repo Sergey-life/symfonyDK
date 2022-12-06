@@ -39,6 +39,19 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
+    //Вирішуємо проблему N+1
+    public function findAll2(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.category', 'c')
+            ->select('p, c')
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Post[] Returns an array of Post objects
 //     */

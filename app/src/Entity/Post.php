@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+//#[Table(name: "post", schema: "schema_name")]
 class Post
 {
     #[ORM\Id]
@@ -28,7 +29,9 @@ class Post
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
+    //Вирішуємо проблему N+1 через аатрибут fetch: "EAGER"
+//    #[ORM\ManyToOne(inversedBy: 'posts', fetch: "EAGER")]
+    #[ORM\ManyToOne(inversedBy: 'posts', fetch: "EAGER")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 

@@ -119,6 +119,7 @@
                   <a href="{{ path('post_edit', {'id': post.id}) }}"><button type="button" class="btn btn-sm btn-outline-secondary">Редагувати</button></a>
                 </div>
                 <small class="text-muted">{{ post.createdAt|ago }}</small>
+                <small class="text-muted">{{ post.category.name}}</small>
               </div>
             </div>
           </div>

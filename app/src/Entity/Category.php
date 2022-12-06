@@ -19,11 +19,11 @@ class Category
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Post::class)]
-    private Collection $products;
+    private Collection $posts;
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
+        $this->posts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -48,13 +48,13 @@ class Category
      */
     public function getProducts(): Collection
     {
-        return $this->products;
+        return $this->posts;
     }
 
     public function addProduct(Post $product): self
     {
-        if (!$this->products->contains($product)) {
-            $this->products->add($product);
+        if (!$this->posts->contains($product)) {
+            $this->posts->add($product);
             $product->setCategory($this);
         }
 
@@ -63,7 +63,7 @@ class Category
 
     public function removeProduct(Post $product): self
     {
-        if ($this->products->removeElement($product)) {
+        if ($this->posts->removeElement($product)) {
             // set the owning side to null (unless already changed)
             if ($product->getCategory() === $this) {
                 $product->setCategory(null);
