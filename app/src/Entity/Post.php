@@ -6,10 +6,8 @@ use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-//#[Table(name: "post", schema: "schema_name")]
 class Post
 {
     #[ORM\Id]
@@ -31,7 +29,7 @@ class Post
 
     //Вирішуємо проблему N+1 через аатрибут fetch: "EAGER"
 //    #[ORM\ManyToOne(inversedBy: 'posts', fetch: "EAGER")]
-    #[ORM\ManyToOne(inversedBy: 'posts', fetch: "EAGER")]
+    #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
